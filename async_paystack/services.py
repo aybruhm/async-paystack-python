@@ -1,5 +1,6 @@
 import requests
 import json
+import asyncio
 
 
 class PayStack:
@@ -8,7 +9,7 @@ class PayStack:
     
 
     @classmethod
-    def verify_payment(self, ref:str):
+    async def verify_payment(self, ref:str):
         """
         Verify a payment made to your account
         
@@ -36,7 +37,7 @@ class PayStack:
 
 
     @classmethod
-    def resolves_account_number(self, account_number:int, account_code:int):
+    async def resolves_account_number(self, account_number:int, account_code:int):
         """
         It resolves the account number of a bank account
         
@@ -65,7 +66,7 @@ class PayStack:
 
 
     @classmethod
-    def resolves_bank_verif_number(self, first_name:str, last_name:str, bvn:int, account_number:int):
+    async def resolves_bank_verif_number(self, first_name:str, last_name:str, bvn:int, account_number:int):
         """
         It takes in a first name, last name, bvn and account number and returns a status and data
         
