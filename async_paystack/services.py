@@ -36,7 +36,7 @@ class PayStack:
 
 
     @classmethod
-    def resolve_account_number(self, account_number:int, account_code:int):
+    def resolves_account_number(self, account_number:int, account_code:int):
         """
         It resolves the account number of a bank account
         
