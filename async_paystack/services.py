@@ -1,4 +1,3 @@
-import requests
 import json
 import aiohttp # noqa
 
@@ -65,7 +64,7 @@ class PayStack:
             "Content-Type": "application/json"
         }
         url = self.BASE_URL + path
-        response = requests.get(url, headers=headers)
+        response = self.session.get(url, headers=headers)
 
         if response.status_code == 200:
             response_data = response.json()
@@ -103,7 +102,7 @@ class PayStack:
         data_json = json.dumps(data, indent=4)
 
         url = self.BASE_URL + path
-        response = requests.post(url, headers=headers, data=data_json)
+        response = self.session.post(url, headers=headers, data=data_json)
 
         if response.status_code == 200:
             response_data = response.json()
