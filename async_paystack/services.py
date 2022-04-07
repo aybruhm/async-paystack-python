@@ -1,15 +1,21 @@
 import json
-import aiohttp # noqa
+import aiohttp
+from rest_api_payload import success_response, error_response
+from async_paystack.config import (
+    authorization_headers, PAYSTACK_SECRET_KEY
+)
 
-
-from async_paystack.config import PAYSTACK_SECRET_KEY
 
 class PayStack:
-    SECRET_KEY = PAYSTACK_SECRET_KEY
+    
+    # Base url
     BASE_URL = "https://api.paystack.co/"
     
-    # Creates an aiohttp session.
-    session = aiohttp.Session()
+    # Secret_Key: Do not expose this in production
+    SECRET_KEY = PAYSTACK_SECRET_KEY
+    
+    # Creates an aiohttp client session object.
+    session = aiohttp.ClientSession()
     
 
     @classmethod
@@ -23,13 +29,11 @@ class PayStack:
         The data key returns a dictionary with the transaction details.
         """
         
-        path = f"transaction/verify/{ref}"
-
         # Request headers 
-        headers = {
-            "Authorization": f"Bearer {self.SECRET_KEY}",
-            "Content-Type": "application/json"
-        }
+        headers = authorization_headers(secret_key=self.SECRET_KEY)
+        
+        # API endpoint
+        path = f"transaction/verify/{ref}"
         
         # API base url + path
         url = self.BASE_URL + path
@@ -37,12 +41,26 @@ class PayStack:
         # Response from API url
         response = await self.session.get(url, headers=headers)
 
+        """This is returning a success response if the request is successful."""
         if response.status_code == 200:
             response_data = response.json()
-            return response_data["status"], response_data["data"]
+            
+            payload = success_response(
+                status=response_data["status"],
+                message="Transaction was successfully verified!",
+                data=response_data["data"]
+            )
+            return payload
 
-        response_data = response.json()
-        return response_data["status"], response_data["message"]
+        else:
+            response_data = response.json()
+            
+            payload = error_response(
+                status=response_data["status"],
+                message="Transaction failed",
+                data=response_data["data"] 
+            )
+            return payload
 
 
     @classmethod
@@ -59,10 +77,8 @@ class PayStack:
         
         path = f"bank/resolve?account_number={account_number}&bank_code={account_code}"
 
-        headers = {
-            "Authorization": f"Bearer {self.SECRET_KEY}",
-            "Content-Type": "application/json"
-        }
+        headers = authorization_headers()
+        
         url = self.BASE_URL + path
         response = self.session.get(url, headers=headers)
 
@@ -88,10 +104,8 @@ class PayStack:
 
         path = "/bvn/match"
 
-        headers = {
-            "Authorization": f"Bearer {self.SECRET_KEY}",
-            "Content-Type": "application/json",
-        }
+        headers = authorization_headers()
+        
         data = {
             "bvn": f"{bvn}",
             "account_number": f"{account_number}",
