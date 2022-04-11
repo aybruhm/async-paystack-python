@@ -1,9 +1,19 @@
 from os import environ
-from typing import Dict
+from typing import Dict, String
 
 
 # Paystack Secret Key
-PAYSTACK_SECRET_KEY = environ.get('PAYSTACK_SECRET_KEY')
+def paystack_secret_key(secret_key:str) -> String:
+    """
+    It gets the secret key from the environment variable and returns it
+    
+    :param secret_key: This is the secret key you got from your Paystack dashboard
+    :type secret_key: str
+    :return: The secret key is being returned.
+    """
+    secret_key = environ.get('PAYSTACK_SECRET_KEY')
+    return secret_key
+
 
 # Authorization Headers Definition
 def authorization_headers(secret_key:str) -> Dict[str,str]:
