@@ -1,10 +1,14 @@
-import json
+import sys
+import os
+
+dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.dirname(dir))
+
+
 from os import environ
 import aiohttp
 from rest_api_payload import success_response, error_response
-from async_paystack.config import (
-    authorization_headers, paystack_secret_key
-)
+from async_paystack import config
 
 
 class PayStack:
@@ -13,7 +17,7 @@ class PayStack:
     BASE_URL = "https://api.paystack.co/"
     
     # Secret_Key: Do not expose this in production
-    SECRET_KEY = paystack_secret_key(
+    SECRET_KEY = config.paystack_secret_key(
         PAYSTACK_SECRET_KEY = environ.get('PAYSTACK_SECRET_KEY')
     )
     
@@ -33,7 +37,7 @@ class PayStack:
         """
         
         # Request headers 
-        headers = authorization_headers(secret_key=self.SECRET_KEY)
+        headers = config.authorization_headers(secret_key=self.SECRET_KEY)
         
         # API endpoint
         path = f"transaction/verify/{ref}"
@@ -71,65 +75,65 @@ class PayStack:
         #     return payload
 
 
-    @classmethod
-    async def resolves_account_number(self, account_number:int, account_code:int):
-        """
-        It resolves the account number of a bank account
+    # @classmethod
+    # async def resolves_account_number(self, account_number:int, account_code:int):
+    #     """
+    #     It resolves the account number of a bank account
         
-        :param account_number: The account number of the customer to resolve
-        :param account_code: This is the bank account number
-        :return: The resolve_account_number function returns a tuple of two values. The first value is a
-        boolean value which is True if the account number is valid and False if it is not. The second value
-        is a dictionary of the account details.
-        """
+    #     :param account_number: The account number of the customer to resolve
+    #     :param account_code: This is the bank account number
+    #     :return: The resolve_account_number function returns a tuple of two values. The first value is a
+    #     boolean value which is True if the account number is valid and False if it is not. The second value
+    #     is a dictionary of the account details.
+    #     """
         
-        path = f"bank/resolve?account_number={account_number}&bank_code={account_code}"
+    #     path = f"bank/resolve?account_number={account_number}&bank_code={account_code}"
 
-        headers = authorization_headers()
+    #     headers = authorization_headers()
         
-        url = self.BASE_URL + path
-        response = self.session.get(url, headers=headers)
+    #     url = self.BASE_URL + path
+    #     response = self.session.get(url, headers=headers)
 
-        if response.status_code == 200:
-            response_data = response.json()
-            return response_data["status"], response_data["data"]
+    #     if response.status_code == 200:
+    #         response_data = response.json()
+    #         return response_data["status"], response_data["data"]
 
-        response_data = response.json()
-        return response_data["status"], response_data["message"]
+    #     response_data = response.json()
+    #     return response_data["status"], response_data["message"]
 
 
-    @classmethod
-    async def resolves_bank_verif_number(self, first_name:str, last_name:str, bvn:int, account_number:int):
-        """
-        It takes in a first name, last name, bvn and account number and returns a status and data
+    # @classmethod
+    # async def resolves_bank_verif_number(self, first_name:str, last_name:str, bvn:int, account_number:int):
+    #     """
+    #     It takes in a first name, last name, bvn and account number and returns a status and data
         
-        :param first_name: The first name of the customer
-        :param last_name: The last name of the customer
-        :param bvn: The BVN of the user whose account you want to verify
-        :param account_number: The account number of the customer
-        :return: The status of the request and the data.
-        """
+    #     :param first_name: The first name of the customer
+    #     :param last_name: The last name of the customer
+    #     :param bvn: The BVN of the user whose account you want to verify
+    #     :param account_number: The account number of the customer
+    #     :return: The status of the request and the data.
+    #     """
 
-        path = "/bvn/match"
+    #     path = "/bvn/match"
 
-        headers = authorization_headers()
+    #     headers = authorization_headers()
         
-        data = {
-            "bvn": f"{bvn}",
-            "account_number": f"{account_number}",
-            "bank_code": "058",
-            "first_name": f"{first_name}",
-            "last_name": f"{last_name}",
-        }
-        data_json = json.dumps(data, indent=4)
+    #     data = {
+    #         "bvn": f"{bvn}",
+    #         "account_number": f"{account_number}",
+    #         "bank_code": "058",
+    #         "first_name": f"{first_name}",
+    #         "last_name": f"{last_name}",
+    #     }
+    #     data_json = json.dumps(data, indent=4)
 
-        url = self.BASE_URL + path
-        response = self.session.post(url, headers=headers, data=data_json)
+    #     url = self.BASE_URL + path
+    #     response = self.session.post(url, headers=headers, data=data_json)
 
-        if response.status_code == 200:
-            response_data = response.json()
-            return response_data["status"], response_data["data"]
+    #     if response.status_code == 200:
+    #         response_data = response.json()
+    #         return response_data["status"], response_data["data"]
 
-        response_data = response.json()
-        return response_data["status"], response_data["message"]
+    #     response_data = response.json()
+    #     return response_data["status"], response_data["message"]
 

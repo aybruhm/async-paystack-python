@@ -1,8 +1,8 @@
-from typing import Dict, String
+from typing import Dict
 
 
 # Paystack Secret Key
-def paystack_secret_key(PAYSTACK_SECRET_KEY:str) -> String:
+def paystack_secret_key(PAYSTACK_SECRET_KEY:str):
     """
     It gets the secret key from the environment variable and returns it
     
@@ -15,7 +15,7 @@ def paystack_secret_key(PAYSTACK_SECRET_KEY:str) -> String:
 
 
 # Authorization Headers Definition
-def authorization_headers(secret_key:str) -> Dict[str,str]:
+def authorization_headers(secret_key:str):
     """
     It takes a secret key and returns a dictionary of headers that can be 
     used to make requests to the API
