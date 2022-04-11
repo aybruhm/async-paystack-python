@@ -1,9 +1,8 @@
-from os import environ
 from typing import Dict, String
 
 
 # Paystack Secret Key
-def paystack_secret_key(secret_key:str) -> String:
+def paystack_secret_key(PAYSTACK_SECRET_KEY:str) -> String:
     """
     It gets the secret key from the environment variable and returns it
     
@@ -11,7 +10,7 @@ def paystack_secret_key(secret_key:str) -> String:
     :type secret_key: str
     :return: The secret key is being returned.
     """
-    secret_key = environ.get('PAYSTACK_SECRET_KEY')
+    secret_key = PAYSTACK_SECRET_KEY
     return secret_key
 
 

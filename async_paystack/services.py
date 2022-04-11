@@ -1,8 +1,9 @@
 import json
+from os import environ
 import aiohttp
 from rest_api_payload import success_response, error_response
 from async_paystack.config import (
-    authorization_headers, PAYSTACK_SECRET_KEY
+    authorization_headers, paystack_secret_key
 )
 
 
@@ -12,7 +13,9 @@ class PayStack:
     BASE_URL = "https://api.paystack.co/"
     
     # Secret_Key: Do not expose this in production
-    SECRET_KEY = PAYSTACK_SECRET_KEY
+    SECRET_KEY = paystack_secret_key(
+        PAYSTACK_SECRET_KEY = environ.get('PAYSTACK_SECRET_KEY')
+    )
     
     # Creates an aiohttp client session object.
     session = aiohttp.ClientSession()
@@ -38,29 +41,34 @@ class PayStack:
         # API base url + path
         url = self.BASE_URL + path
         
-        # Response from API url
-        response = await self.session.get(url, headers=headers)
-
-        """This is returning a success response if the request is successful."""
-        if response.status_code == 200:
-            response_data = response.json()
+        async with self.session:
             
-            payload = success_response(
-                status=response_data["status"],
-                message="Transaction was successfully verified!",
-                data=response_data["data"]
-            )
-            return payload
+            response = await self.session.get(url, headers=headers)
+            print("Response: ", response)
+        
+        # # Response from API url
+        # response = await self.session.get(url, headers=headers)
 
-        else:
-            response_data = response.json()
+        # """This is returning a success response if the request is successful."""
+        # if response.status_code == 200:
+        #     response_data = response.json()
             
-            payload = error_response(
-                status=response_data["status"],
-                message="Transaction failed",
-                data=response_data["data"] 
-            )
-            return payload
+        #     payload = success_response(
+        #         status=response_data["status"],
+        #         message="Transaction was successfully verified!",
+        #         data=response_data["data"]
+        #     )
+        #     return payload
+
+        # else:
+        #     response_data = response.json()
+            
+        #     payload = error_response(
+        #         status=response_data["status"],
+        #         message="Transaction failed",
+        #         data=response_data["data"] 
+        #     )
+        #     return payload
 
 
     @classmethod
@@ -125,5 +133,3 @@ class PayStack:
         response_data = response.json()
         return response_data["status"], response_data["message"]
 
-
-paystack = PayStack()
