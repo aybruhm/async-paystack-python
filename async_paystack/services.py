@@ -6,7 +6,7 @@ sys.path.append(os.path.dirname(dir))
 
 
 from os import environ
-import aiohttp
+import aiohttp, asyncio
 from rest_api_payload import success_response, error_response
 from async_paystack import config
 
@@ -137,3 +137,7 @@ class PayStack:
     #     response_data = response.json()
     #     return response_data["status"], response_data["message"]
 
+
+if __name__ == '__main__':
+    paystack = PayStack()
+    asyncio.run(paystack.verify_payment(ref="jhdnche8h9hw8d`"))
