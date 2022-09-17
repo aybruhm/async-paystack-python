@@ -1,143 +1,289 @@
-import sys
-import os
+# Native Imports
+import sys, os, json
 
+# Typing Imports
+from typing import Dict, Tuple
+
+# Own Imports
+from async_paystack import config
+
+# Native/Third party Imports
+import httpx
+from decouple import config as env_config
+
+
+
+# Adding the parent directory to the path 
+# so that the `config.py` file can be imported.
 dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.dirname(dir))
 
 
-from os import environ
-import aiohttp, asyncio
-from rest_api_payload import success_response, error_response
-from async_paystack import config
-
 
 class PayStack:
-    
-    # Base url
+    # global config
+    # Secret_Key: Do not expose this in production
+    PAYSTACK_SECRET_KEY = config.paystack_secret_key(PAYSTACK_SECRET_KEY = env_config("PAYSTACK_SECRET_KEY"))
     BASE_URL = "https://api.paystack.co/"
     
-    # Secret_Key: Do not expose this in production
-    SECRET_KEY = config.paystack_secret_key(
-        PAYSTACK_SECRET_KEY = environ.get('PAYSTACK_SECRET_KEY')
-    )
+    # authentication headers for paystack
+    headers = config.authorization_headers(secret_key=PAYSTACK_SECRET_KEY)
     
-    # Creates an aiohttp client session object.
-    session = aiohttp.ClientSession()
     
-
-    @classmethod
-    async def verify_payment(self, ref:str):
+    async def initiate_transaction(self, user_email:str, amount:int) -> Tuple[Dict, Dict]:
         """
-        Verify a payment made to your account
+        This function initiates a transaction for a user 
         
-        :param ref: The reference you want to verify
-        :return: The response data is a dictionary with two keys, status and data.
-        The status key returns a boolean value indicating whether the request was successful or not.
-        The data key returns a dictionary with the transaction details.
+        :param user_email: The email of the user you want to initiate a transaction for
+        :type user_email: str
+        :param amount: The amount to be charged
+        :type amount: int
+        :return: A tuple of two dictionaries.
         """
         
-        # Request headers 
-        headers = config.authorization_headers(secret_key=self.SECRET_KEY)
-        
-        # API endpoint
-        path = f"transaction/verify/{ref}"
-        
-        # API base url + path
-        url = self.BASE_URL + path
-        
-        async with self.session:
+        async with httpx.AsyncClient() as client:
             
-            response = await self.session.get(url, headers=headers)
-            print("Response: ", response)
-        
-        # # Response from API url
-        # response = await self.session.get(url, headers=headers)
-
-        # """This is returning a success response if the request is successful."""
-        # if response.status_code == 200:
-        #     response_data = response.json()
+            data = {
+                "email": f"{user_email}", 
+                "amount": int(amount)
+            }
+            url = self.BASE_URL + "transaction/initialize"
+            response = await client.post(url, headers=self.headers, data=json.dumps(data))
             
-        #     payload = success_response(
-        #         status=response_data["status"],
-        #         message="Transaction was successfully verified!",
-        #         data=response_data["data"]
-        #     )
-        #     return payload
-
-        # else:
-        #     response_data = response.json()
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
             
-        #     payload = error_response(
-        #         status=response_data["status"],
-        #         message="Transaction failed",
-        #         data=response_data["data"] 
-        #     )
-        #     return payload
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+                
 
-
-    # @classmethod
-    # async def resolves_account_number(self, account_number:int, account_code:int):
-    #     """
-    #     It resolves the account number of a bank account
+    async def verify_transaction(self, ref:str) -> Tuple[Dict, Dict]:
+        """
+        This function verifies a transaction using the transaction reference
         
-    #     :param account_number: The account number of the customer to resolve
-    #     :param account_code: This is the bank account number
-    #     :return: The resolve_account_number function returns a tuple of two values. The first value is a
-    #     boolean value which is True if the account number is valid and False if it is not. The second value
-    #     is a dictionary of the account details.
-    #     """
+        :param ref: The transaction reference number
+        :type ref: str
+        :return: A tuple of two dictionaries.
+        """
         
-    #     path = f"bank/resolve?account_number={account_number}&bank_code={account_code}"
+        async with httpx.AsyncClient() as client:
+            
+            url = self.BASE_URL + f"transaction/verify/{ref}"
+            response = await client.get(url, headers=json.dumps(self.headers))
 
-    #     headers = authorization_headers()
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+
+    
+    async def charge_authorization(self, authorization_code:str, email:str, amount:str) -> Tuple[Dict, Dict]:
+        """
+        This function charges an authorization code for subsequently (reoccuring) payments
         
-    #     url = self.BASE_URL + path
-    #     response = self.session.get(url, headers=headers)
-
-    #     if response.status_code == 200:
-    #         response_data = response.json()
-    #         return response_data["status"], response_data["data"]
-
-    #     response_data = response.json()
-    #     return response_data["status"], response_data["message"]
-
-
-    # @classmethod
-    # async def resolves_bank_verif_number(self, first_name:str, last_name:str, bvn:int, account_number:int):
-    #     """
-    #     It takes in a first name, last name, bvn and account number and returns a status and data
+        :param authorization_code: The authorization code returned from the authorized call
+        :type authorization_code: str
+        :param email: The email address of the customer
+        :type email: str
+        :param amount: The amount to be charged
+        :type amount: str
+        :return: A tuple of two dictionaries.
+        """
         
-    #     :param first_name: The first name of the customer
-    #     :param last_name: The last name of the customer
-    #     :param bvn: The BVN of the user whose account you want to verify
-    #     :param account_number: The account number of the customer
-    #     :return: The status of the request and the data.
-    #     """
-
-    #     path = "/bvn/match"
-
-    #     headers = authorization_headers()
+        async with httpx.AsyncClient() as client:
+            
+            data = {
+                "authorization_code": f"{authorization_code}", 
+                "email": f"{email}", 
+                "amount": int(amount)
+            }
+            url = self.BASE_URL + "transaction/charge_authorization"
+            response = await client.post(url, headers=json.dumps(self.headers), data=json.dumps(data))
+            
+            if response.status_code:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+            
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+    
+    
+    async def verify_account_number(self, account_number:str, bank_code:str) -> Tuple[Dict, Dict]:
+        """
+        This function verifies the account number
         
-    #     data = {
-    #         "bvn": f"{bvn}",
-    #         "account_number": f"{account_number}",
-    #         "bank_code": "058",
-    #         "first_name": f"{first_name}",
-    #         "last_name": f"{last_name}",
-    #     }
-    #     data_json = json.dumps(data, indent=4)
-
-    #     url = self.BASE_URL + path
-    #     response = self.session.post(url, headers=headers, data=data_json)
-
-    #     if response.status_code == 200:
-    #         response_data = response.json()
-    #         return response_data["status"], response_data["data"]
-
-    #     response_data = response.json()
-    #     return response_data["status"], response_data["message"]
-
-
-if __name__ == '__main__':
-    paystack = PayStack()
-    asyncio.run(paystack.verify_payment(ref="jhdnche8h9hw8d`"))
+        :param account_number: The account number of the bank account you want to verify
+        :type account_number: str
+        :param bank_code: The bank code of the bank you want to verify the account number for
+        :type bank_code: str
+        :return: A tuple of two dictionaries.
+        """
+        
+        async with httpx.AsyncClient() as client:
+            
+            url = self.BASE_URL + f"bank/resolve?account_number={account_number}&bank_code={bank_code}"
+            response = await client.get(url, headers=json.dumps(self.headers))
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+        
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+            
+        
+    async def validate_account_number(
+        self, bank_code:str, country_code:str, account_number:str, 
+        account_name:str, account_type:str, document_type:str, document_number:str) -> Tuple[Dict, Dict]:
+        """
+        This function validates a customer's bank account number
+        
+        :param bank_code: The bank code of the customer's bank
+        :type bank_code: str
+        :param country_code: The two digit ISO code of the customer's bank
+        :type country_code: str
+        :param account_number: Customer's account number
+        :type account_number: str
+        :param account_name: Customer's first and last name registered with their bank
+        :type account_name: str
+        :param account_type: This can take one of: [ personal, business ]
+        :type account_type: str
+        :param document_type: This can take one of: [ identityNumber, passportNumber,
+        businessRegistrationNumber ]
+        :type document_type: str
+        :param document_number: This is the customer's identity number
+        :type document_number: str
+        :return: A tuple of two dictionaries.
+        """
+        
+        async with httpx.AsyncClient() as client:
+            
+            data = {
+                "bank_code": f"{bank_code}",
+                "country_code": f"{country_code}",
+                "account_number": f"{account_number}",
+                "account_name": f"{account_name}",
+                "account_type": f"{account_type}",
+                "document_type": f"{document_type}",
+                "document_number": f"{document_number}"
+            }
+            url = self.BASE_URL + "bank/validate"
+            response = await client.post(url, headers=json.dumps(self.headers), data=json.dumps(data))
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+            
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+    
+    
+    async def create_transfer_recipient(self, nuban:str, name:str, account_number:str, bank_code:str, currency:str) -> Tuple[Dict, Dict]:
+        """
+        This function creates a transfer recipient
+        
+        :param nuban: The NUBAN (Nigerian Uniform Bank Account Number) of the recipient
+        :type nuban: str
+        :param name: The name of the recipient
+        :type name: str
+        :param account_number: The account number of the recipient
+        :type account_number: str
+        :param bank_code: The bank code of the bank you want to transfer to
+        :type bank_code: str
+        :param currency: The currency of the account. This should be NGN for Nigerian Naira
+        :type currency: str
+        :return: A tuple of two dictionaries.
+        """
+        
+        async with httpx.AsyncClient() as client:
+            
+            data = {
+                "type": f"{nuban}",
+                "name": f"{name}",
+                "account_number": f"{account_number}",
+                "bank_code": f"{bank_code}",
+                "currency": f"{currency}",
+            }
+            url = self.BASE_URL = "transferrecipient"
+            response = await client.post(url, headers=json.dumps(self.headers), data=json.dumps(data))
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+            
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+    
+    
+    async def initiate_transfer(self, source:str, amount:int, recipient_code:str, reason:str) -> Tuple[Dict, Dict]:
+        """
+        This function initiates a transfer from your account to another account
+        
+        :param source: The source (balance) wallet or account to debit the funds from
+        :type source: str
+        :param amount: The amount to be transferred
+        :type amount: int
+        :param recipient_code: The recipient's code you got from the `create_transfer_recipient` function
+        :type recipient_code: str
+        :param reason: The reason for the transfer
+        :type reason: str
+        :return: A tuple of two dictionaries.
+        """
+        
+        async with httpx.AsyncClient() as client:
+            
+            data = {
+                "source": f"{source}",
+                "amount": int(amount), 
+                "recipient": f"{recipient_code}",
+                "reason": f"{reason}", 
+            }
+            url = self.BASE_URL + "transfer"
+            response = await client.post(url, headers=json.dumps(self.headers), data=json.dumps(data))
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+        
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["message"]
+            
+    
+    async def complete_transfer(self, transfer_code:str, otp_code:str) -> Tuple[Dict, Dict]:
+        """
+        This function completes a transfer initiated by the `initiate_transfer` function
+        
+        :param transfer_code: The transfer code you got from the `initiate_transfer` method
+        :type transfer_code: str
+        :param otp_code: The OTP code sent to the recipient's phone number
+        :type otp_code: str
+        :return: A tuple of two dictionaries.
+        """
+        
+        async with httpx.AsyncClient() as client:
+            
+            data = { 
+                "transfer_code": f"{transfer_code}", 
+                "otp": f"{otp_code}"
+            }
+            url = self.BASE_URL + "transfer/finalize_transfer"
+            response = await client.post(url, headers=json.dumps(self.headers), data=json.dumps(data))
+            
+            if response.status_code == 200:
+                response_data = response.json()
+                return response_data["status"], response_data["data"]
+            
+            else:
+                response_data = response.json()
+                return response_data["status"], response_data["messagge"]
+    
