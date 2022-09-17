@@ -12,7 +12,7 @@ import json
 
 
 class Verification(PayStack):
-    """The Verification API allows you perform KYC processes"""
+    """The Verification API Wrapper allows you perform KYC processes"""
     
     async def resolves_account_number(self, account_number:str, bank_code:str) -> Tuple[Dict, Dict]:
         """
