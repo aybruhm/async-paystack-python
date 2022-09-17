@@ -14,9 +14,7 @@ import json
 
 class Transfers(PayStack):
     """
-    With the Paystack Transfer API Wrapper, 
-    you can send money to bank accounts and 
-    mobile money wallet.
+    The Transfer API Wrapper allows you to send money to bank accounts and mobile money wallet.
     """
             
     async def validate_account_number(
