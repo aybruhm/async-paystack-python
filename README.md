@@ -1,2 +1,2 @@
-# async-paystack
-Asynchronous paystack payment integration
+# async-paystack-python
+Unofficial asynchronous python wrapper for paystack payment
