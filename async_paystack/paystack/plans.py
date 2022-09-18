@@ -25,6 +25,8 @@ class Plans(PayStack):
         :param amount: The amount in kobo. This value must be greater than or equal to 50
         :type amount: int
         :return: A tuple of two dictionaries.
+        
+        Read More: https://paystack.com/docs/api/#plan-create
         """
         
         async with httpx.AsyncClient() as client:
@@ -51,6 +53,8 @@ class Plans(PayStack):
         This function fetches list plans available on your integration
         
         :return: A tuple of two dictionaries.
+        
+        Read More: https://paystack.com/docs/api/#plan-list
         """
         
         async with httpx.AsyncClient() as client:
@@ -74,6 +78,8 @@ class Plans(PayStack):
         :param id_or_code: The ID or code of the plan you want to fetch
         :type id_or_code: str
         :return: A tuple of two dictionaries.
+        
+        Read More: https://paystack.com/docs/api/#plan-fetch
         """
         
         async with httpx.AsyncClient() as client:
@@ -99,6 +105,8 @@ class Plans(PayStack):
         :param name: The name of the plan
         :type name: str
         :return: A tuple of the status and the data.
+        
+        Read More: https://paystack.com/docs/api/#plan-update
         """
         
         async with httpx.AsyncClient() as client:
