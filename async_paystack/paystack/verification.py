@@ -23,6 +23,8 @@ class Verification(PayStack):
         :param bank_code: The bank code of the bank you want to verify the account number for
         :type bank_code: str
         :return: A tuple of two dictionaries.
+        
+        Read More: https://paystack.com/docs/api#verification-resolve-account
         """
         
         async with httpx.AsyncClient() as client:
@@ -61,6 +63,8 @@ class Verification(PayStack):
         :param document_number: This is the customer's identity number
         :type document_number: str
         :return: A tuple of two dictionaries.
+
+        See More: https://paystack.com/docs/api/#verification-validate-account
         """
         
         async with httpx.AsyncClient() as client:
@@ -94,6 +98,8 @@ class Verification(PayStack):
         :param bin: The first 6 digits of the card number
         :type bin: str
         :return: A tuple of two dictionaries.
+        
+        Read More: https://paystack.com/docs/api/#verification-resolve-card
         """
         
         async with httpx.AsyncClient() as client:
