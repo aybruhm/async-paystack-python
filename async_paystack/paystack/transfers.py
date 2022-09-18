@@ -11,7 +11,6 @@ import httpx
 import json
 
 
-
 class Transfers(PayStack):
     """
     The Transfer API Wrapper allows you to send money to bank accounts and mobile money wallet.
@@ -39,6 +38,8 @@ class Transfers(PayStack):
         :param document_number: This is the customer's identity number
         :type document_number: str
         :return: A tuple of two dictionaries.
+
+        See More: https://paystack.com/docs/api/#verification-validate-account
         """
         
         async with httpx.AsyncClient() as client:
@@ -79,6 +80,8 @@ class Transfers(PayStack):
         :param currency: The currency of the account. This should be NGN for Nigerian Naira
         :type currency: str
         :return: A tuple of two dictionaries.
+
+        See More: https://paystack.com/docs/api/#transfer-recipient-create
         """
         
         async with httpx.AsyncClient() as client:
@@ -115,6 +118,8 @@ class Transfers(PayStack):
         :param reason: The reason for the transfer
         :type reason: str
         :return: A tuple of two dictionaries.
+
+        See More: https://paystack.com/docs/api/#transfer-initiate
         """
         
         async with httpx.AsyncClient() as client:
@@ -146,6 +151,8 @@ class Transfers(PayStack):
         :param otp_code: The OTP code sent to the recipient's phone number
         :type otp_code: str
         :return: A tuple of two dictionaries.
+
+        See More: https://paystack.com/docs/api/#transfer-finalize
         """
         
         async with httpx.AsyncClient() as client:
