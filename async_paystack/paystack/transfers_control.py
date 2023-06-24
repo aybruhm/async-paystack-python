@@ -24,7 +24,7 @@ class TransfersControl(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + "balance"
+            url = self.base_url + "balance"
             response = await client.get(url=url, headers=json.dumps(self.headers()))
 
             if response.status_code == 200:
@@ -44,7 +44,7 @@ class TransfersControl(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + "balance/ledger"
+            url = self.base_url + "balance/ledger"
             response = await client.get(url=url, headers=json.dumps(self.headers()))
 
             if response.status_code == 200:
@@ -71,7 +71,7 @@ class TransfersControl(PayStack):
 
         async with httpx.AsyncClient() as client:
             data = {"transfer_code": f"{transfer_code}", "reason": f"{reason}"}
-            url = self.BASE_URL + "transfer/resend_otp"
+            url = self.base_url + "transfer/resend_otp"
 
             response = await client.post(
                 url=url, headers=json.dumps(self.headers()), data=json.dumps(data)
@@ -93,7 +93,7 @@ class TransfersControl(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + "transfer/disable_otp"
+            url = self.base_url + "transfer/disable_otp"
             response = await client.post(url=url, headers=json.dumps(self.headers()))
 
             if response.status_code == 200:
@@ -116,7 +116,7 @@ class TransfersControl(PayStack):
 
         async with httpx.AsyncClient() as client:
             data = {"otp": f"{otp}"}
-            url = self.BASE_URL + "transfer/disable_otp_finalize"
+            url = self.base_url + "transfer/disable_otp_finalize"
 
             response = await client.post(
                 url=url, headers=json.dumps(self.headers()), data=json.dumps(data)
@@ -139,7 +139,7 @@ class TransfersControl(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + "transfer/enable_otp"
+            url = self.base_url + "transfer/enable_otp"
             response = await client.post(url=url, headers=json.dumps(self.headers()))
 
             if response.status_code == 200:
