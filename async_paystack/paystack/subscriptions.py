@@ -3,7 +3,7 @@ import json
 from typing import Dict, Tuple, Union
 
 # Own Imports
-from async_paystack.services import PayStack
+from async_paystack.services.base_paystack import PayStack
 
 # Third Party Imports
 import httpx
@@ -51,9 +51,8 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["messsage"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
 
     async def list_subscriptions(self) -> Tuple[bool, Union[Dict, str]]:
         """
@@ -72,9 +71,8 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["message"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
 
     async def fetch_subscription(
         self, id_or_code: str
@@ -97,9 +95,8 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["message"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
 
     async def enable_subscription(
         self, code: str, token: str
@@ -128,9 +125,8 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["message"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
 
     async def disable_subscription(
         self, code: str, token: str
@@ -159,9 +155,8 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["message"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
 
     async def generate_update_subscription_link(
         self, code: str
@@ -188,9 +183,8 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["message"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
 
     async def send_update_subscription_link(
         self, code: str
@@ -218,6 +212,5 @@ class Subscriptions(PayStack):
                 response_data = response.json()
                 return response_data["status"], response_data["data"]
 
-            else:
-                response_data = response.json()
-                return response_data["status"], response_data["message"]
+            response_data = response.json()
+            return response_data["status"], response_data["messsage"]
