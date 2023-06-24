@@ -73,10 +73,10 @@ It is important that when run this code in Django without the asynchronous suppo
 In the `test_initiate_transaction` example, I:
 
 - Imported the necessary modules and defined the test function using the `@pytest.mark.asyncio` decorator to indicate it's an asynchronous test case.
-- Created an instance of the class `(Transactions)` that contains the `test_initiate_transaction` method to be tested.
+- Created an instance of the class `(Transactions)` that contains the `initiate_transaction` method to be tested.
 - Mocked the `httpx.AsyncClient` class and its post method using `mock.AsyncMock()` and `mock.MagicMock()`, respectively. I set the status_code of the response to `200` and define the JSON response to match the expected behavior.
 - Set the mocked client as the client used in the `Transactions` instance by assigning it to the client attribute of the instance.
-- Call the `test_initiate_transaction` method with test data (user_email and amount).
+- Call the `initiate_transaction` method with test data (user_email and amount).
 - Asserted that the returned result matches the expected result.
 - Finally, I asserted that the post method of the mocked client was called with the expected parameters.
 
