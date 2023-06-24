@@ -31,7 +31,7 @@ class Transactions(PayStack):
 
         async with httpx.AsyncClient() as client:
             data = {"email": f"{user_email}", "amount": int(amount)}
-            url = self.BASE_URL + "transaction/initialize"
+            url = self.base_url + "transaction/initialize"
             
             response = await client.post(
                 url, headers=self.headers(), data=json.dumps(data)
@@ -54,7 +54,7 @@ class Transactions(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + f"transaction/verify/{ref}"
+            url = self.base_url + f"transaction/verify/{ref}"
             response = await client.get(url, headers=self.headers())
 
             if response.status_code == 200:
@@ -72,7 +72,7 @@ class Transactions(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + "transaction"
+            url = self.base_url + "transaction"
             response = await client.get(url, headers=self.headers())
 
             if response.status_code == 200:
@@ -90,7 +90,7 @@ class Transactions(PayStack):
         """
 
         async with httpx.AsyncClient() as client:
-            url = self.BASE_URL + f"transaction/{id}"
+            url = self.base_url + f"transaction/{id}"
             response = await client.get(url, headers=self.headers())
 
             if response.status_code == 200:
@@ -121,7 +121,7 @@ class Transactions(PayStack):
                 "email": f"{email}",
                 "amount": int(amount),
             }
-            url = self.BASE_URL + "transaction/charge_authorization"
+            url = self.base_url + "transaction/charge_authorization"
             response = await client.post(
                 url, headers=self.headers(), data=json.dumps(data)
             )
@@ -162,7 +162,7 @@ class Transactions(PayStack):
                 "amount": f"{amount}",
                 "authorization_code": f"{authorization_code}",
             }
-            url = self.BASE_URL + "transaction/check_authorization"
+            url = self.base_url + "transaction/check_authorization"
             response = await client.post(
                 url, headers=self.headers(), data=json.dumps(data)
             )
