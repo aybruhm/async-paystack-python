@@ -16,7 +16,7 @@ class Transactions(PayStack):
     """
 
     async def initiate_transaction(
-        self, user_email: str, amount: int
+        self, user_email: str, amount: int, reference: str = None
     ) -> Tuple[bool, Union[Dict, str]]:
         """
         This function initiates a transaction for a user
@@ -25,6 +25,8 @@ class Transactions(PayStack):
         :type user_email: str
         :param amount: The amount to be charged
         :type amount: int
+        :param amount: The reference of the transaction
+        :type reference: str
 
         :return::return:  A tuple of the status and the data.
         """
@@ -32,6 +34,9 @@ class Transactions(PayStack):
         async with httpx.AsyncClient() as client:
             data = {"email": f"{user_email}", "amount": int(amount)}
             url = self.base_url + "transaction/initialize"
+            
+            if reference:
+                data["reference"] = reference
             
             response = await client.post(
                 url, headers=self.headers(), data=json.dumps(data)
